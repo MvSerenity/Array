@@ -1,0 +1,100 @@
+/* 
+3. Generate one n x n array, and 
+i.   find the no. of non-zero elements.
+ii.  find the sum of elements of diagonals.
+iii. find the product of diagonal elements.
+ */
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+#include <assert.h>
+
+#define xtime_start \
+    {               \
+        clock_t _start = clock()
+#define xtime_stop                                                 \
+        clock_t _stop = clock();                                   \
+        double _xtime = (double)(_stop - _start) / CLOCKS_PER_SEC; \
+        printf("execution time = %g secs\n", _xtime);              \
+    }
+
+#define xtime(f) ({                                             \
+    clock_t start = clock();                                    \
+    f;                                                          \
+    double _xtime = (double)(clock() - start) / CLOCKS_PER_SEC; \
+    printf("execution time = %g secs\n", _xtime);               \
+    _xtime;                                                     \
+})
+
+int random_number(int min, int max) { return min+rand()%((max+1)-min); }
+
+/** @brief i. find the no. of non-zero elements. */
+int f1(int rows, int cols, int matrix[rows][cols]) {
+    int res = 0;
+    for(int i=0; i<rows; ++i)
+        for(int j=0; j<cols; ++j)
+            if(matrix[i][j] != 0) ++res;
+    return res;
+}
+
+/** @brief ii. find the sum of elements of diagonals. */
+void f2(int rows, int cols, int matrix[rows][cols], int *sum_major, int *sum_minor) {
+    assert(rows == cols);
+    *sum_major = *sum_minor = 0;
+    for(int i=0; i<rows; ++i)
+        for(int j=0; j<cols; ++j) {
+            if(i==j) *sum_major += matrix[i][j];
+            if(i+j == rows-1) *sum_minor += matrix[i][j];
+        }
+}
+
+/** @brief iii. find the product of diagonal elements. */
+void f3(int rows, int cols, int matrix[rows][cols], int *prod_major, int *prod_minor) {
+    assert(rows == cols);
+    *prod_major = *prod_minor = 1;
+    for(int i=0; i<rows; ++i)
+        for(int j=0; j<cols; ++j) {
+            if(i==j) *prod_major *= matrix[i][j];
+            if(i+j == rows-1) *prod_minor *= matrix[i][j];
+        }
+}
+
+void print_matrix(int rows, int cols, int matrix[rows][cols]) {
+    for(int i=0; i<rows; ++i) {
+        for(int j=0; j<cols; ++j)
+            printf("%d ",matrix[i][j]);
+        printf("\n");
+    }
+}
+
+void init_matrix(int rows, int cols, int matrix[rows][cols]) {
+    for(int i=0; i<rows; ++i)
+        for(int j=0; j<cols; ++j)
+            matrix[i][j] = random_number(10, 99);
+}
+
+int main(int argc, char **argv) {
+    srand(time(NULL));
+
+    #define N 1000
+    int matrix[N][N];
+    int rows = sizeof(matrix)/sizeof(matrix[0]);
+    int cols = sizeof(matrix[0])/sizeof(matrix[0][0]);
+
+
+    init_matrix(rows, cols, matrix);
+
+    xtime_start;
+    f1(rows, cols, matrix);
+    xtime_stop;
+
+    int a, b;
+    xtime_start;
+    f2(rows, cols, matrix, &a, &b);
+    xtime_stop;
+
+    xtime_start;
+    f3(rows, cols, matrix, &a, &b);
+    xtime_stop;
+}
